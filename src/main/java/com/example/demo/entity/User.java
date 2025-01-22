@@ -8,10 +8,10 @@ import lombok.Data;
 @Data
 public class User {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private String username;
+    private String password;
+    private String role;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "profile_id", referencedColumnName = "id")
-    private Profile profile;
 }
