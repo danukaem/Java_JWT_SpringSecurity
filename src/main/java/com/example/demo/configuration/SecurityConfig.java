@@ -39,13 +39,12 @@ public class SecurityConfig {
 
     @Autowired
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(customUserDetailsService).passwordEncoder(passwordEncoder());
+        auth.userDetailsService(customUserDetailsService)
+                .passwordEncoder(new BCryptPasswordEncoder());
     }
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-
-
         return authenticationConfiguration.getAuthenticationManager();
     }
 
@@ -58,7 +57,10 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth.requestMatchers("/authenticate").permitAll()
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/authenticate" ).permitAll()
+//                        .requestMatchers("/authenticate", "/user/save").permitAll()
+//                        .requestMatchers("/user/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.addFilterBefore(new JwtRequestFilter(jwtUtil, customUserDetailsService), UsernamePasswordAuthenticationFilter.class);

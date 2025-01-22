@@ -1,8 +1,10 @@
 package com.example.demo.util;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -35,15 +37,25 @@ public class JwtUtil {
         return extractExpiration(token).before(new Date());
     }
 
-    public String generateToken(String username) {
+    public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, username);
+        claims.put("role", userDetails.getAuthorities());
+        return createToken(claims, userDetails.getUsername());
     }
 
     private String createToken(Map<String, Object> claims, String subject) {
-        return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
-                .signWith(SignatureAlgorithm.HS256, secret).compact();
+
+        JwtBuilder jwtBuilder = Jwts.builder().setClaims(claims);
+        JwtBuilder jwtBuilder1 = jwtBuilder.setSubject(subject);
+        JwtBuilder jwtBuilder2 = jwtBuilder1.setIssuedAt(new Date(System.currentTimeMillis()));
+        JwtBuilder jwtBuilder3 = jwtBuilder2.setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60));
+        JwtBuilder jwtBuilder4 = jwtBuilder3.signWith(SignatureAlgorithm.HS256, secret);
+
+        System.out.println("*********************1");
+        System.out.println(jwtBuilder4.compact());
+        System.out.println("*********************2");
+
+        return jwtBuilder4.compact();
     }
 
     public Boolean validateToken(String token, String username) {
