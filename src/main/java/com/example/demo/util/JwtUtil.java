@@ -40,6 +40,7 @@ public class JwtUtil {
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", userDetails.getAuthorities());
+//        claims.put("role", "ROLE_"+userDetails.getAuthorities());
         return createToken(claims, userDetails.getUsername());
     }
 
@@ -50,11 +51,6 @@ public class JwtUtil {
         JwtBuilder jwtBuilder2 = jwtBuilder1.setIssuedAt(new Date(System.currentTimeMillis()));
         JwtBuilder jwtBuilder3 = jwtBuilder2.setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60));
         JwtBuilder jwtBuilder4 = jwtBuilder3.signWith(SignatureAlgorithm.HS256, secret);
-
-        System.out.println("*********************1");
-        System.out.println(jwtBuilder4.compact());
-        System.out.println("*********************2");
-
         return jwtBuilder4.compact();
     }
 
